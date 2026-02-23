@@ -2699,6 +2699,12 @@ extension MenuBarItemManager {
         // Don't restore while suppressing relocations (first launch / reset).
         guard !suppressNextNewLeftmostItemRelocation else { return false }
 
+        // Don't restore when we recently performed our own move operations
+        // (user drag in the Layout Bar, internal relocations, etc.). External
+        // app restarts never go through our move() path, so their cache cycles
+        // will have no recent move timestamp.
+        guard !lastMoveOperationOccurred(within: .seconds(2)) else { return false }
+
         // Only restore when previous window IDs have disappeared, indicating
         // an app restarted (old windows destroyed, new ones created). During
         // move operations macOS can briefly report duplicate windows for the
