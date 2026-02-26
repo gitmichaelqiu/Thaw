@@ -2910,7 +2910,8 @@ extension MenuBarItemManager {
             if let exact = savedSectionForItem[item.uniqueIdentifier] {
                 savedSection = exact
             } else if DynamicItemOverrides.isDynamic(namespaceString),
-                      let fallback = savedSectionByNamespace[namespaceString] {
+                      let fallback = savedSectionByNamespace[namespaceString]
+            {
                 savedSection = fallback
             } else {
                 continue

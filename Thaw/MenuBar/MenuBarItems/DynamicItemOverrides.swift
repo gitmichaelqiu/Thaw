@@ -21,9 +21,9 @@
 enum DynamicItemOverrides {
     /// Bundle identifiers of apps known to display dynamic menu bar item titles.
     private static let knownDynamicNamespaces: Set<String> = [
-        "com.p0deje.Dato",                       // Dato — calendar & world clock entries
-        "com.raycast.macos",                     // Raycast — calendar plugin items
-        "com.flexibits.fantastical2.mac",        // Fantastical — upcoming event label
+        "com.p0deje.Dato", // Dato — calendar & world clock entries
+        "com.raycast.macos", // Raycast — calendar plugin items
+        "com.flexibits.fantastical2.mac", // Fantastical — upcoming event label
         "com.flexibits.fantastical2.mac.setapp", // Fantastical (Setapp) — upcoming event label
     ]
 
