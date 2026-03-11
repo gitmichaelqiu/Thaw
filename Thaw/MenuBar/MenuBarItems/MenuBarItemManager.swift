@@ -106,7 +106,7 @@ final class MenuBarItemManager: ObservableObject {
     @Published private(set) var areControlItemsMissing = false
 
     /// Diagnostic logger for the menu bar item manager.
-    fileprivate static nonisolated let diagLog = DiagLog(category: "MenuBarItemManager")
+    fileprivate nonisolated static let diagLog = DiagLog(category: "MenuBarItemManager")
 
     /// Semaphore to prevent overlapping event operations.
     private let eventSemaphore = SimpleSemaphore(value: 1)
@@ -996,9 +996,11 @@ extension MenuBarItemManager {
                     await self?.cacheItemsIfNeeded()
                 }
                 return
-            } else {
-                isRestoringItemOrder = false
             }
+            // Note: isRestoringItemOrder remains true here so that if a concurrent
+            // cache call occurs (e.g., from app launch notification), it won't
+            // prematurely reset the flag and allow saveSectionOrder to run while
+            // we're still in the cooldown period from previous moves.
 
             let didRestoreOrder = await restoreSavedItemOrder(
                 items,
@@ -1028,6 +1030,12 @@ extension MenuBarItemManager {
             }
 
             await uncheckedCacheItems(items: items, controlItems: controlItems, displayID: displayID)
+
+            // Reset the flag since no restore happened in this cache cycle.
+            // This must be done before the function ends so that saveSectionOrder
+            // can run for future caches.
+            isRestoringItemOrder = false
+
             MenuBarItemManager.diagLog.debug("cacheItemsRegardless: finished, cache now has \(self.itemCache.managedItems.count) managed items")
         }
     }
@@ -3838,8 +3846,8 @@ private extension CGMouseButton {
 private extension Duration {
     /// Returns the duration in milliseconds as a Double.
     var milliseconds: Double {
-        let (seconds, attoseconds) = self.components
-        return Double(seconds) * 1000 + Double(attoseconds) / 1_000_000_000_000_000
+        let (seconds, attoseconds) = components
+        return Double(seconds) * 1000 + Double(attoseconds) / 1000000000000000
     }
 }
 
