@@ -18649,6 +18649,12 @@
             "value" : "Izin Perekaman Layar diperlukan untuk menampilkan tip alat."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per visualizzare i suggerimenti è necessaria l'autorizzazione per la registrazione dello schermo."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -18725,6 +18731,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Izin Perekaman Layar diperlukan untuk mencari item bar menu."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per cercare le voci nella barra dei menu è necessario disporre dell'autorizzazione per la registrazione dello schermo."
           }
         },
         "ja" : {
