@@ -56,25 +56,14 @@ Thaw is currently available in the following languages:
         <th align="left">Completion</th>
     </tr>
     <tr>
-        <td><b>English</b></td>
-        <td>Base</td>
-        <td align="center">🇬🇧/🇺🇸</td>
-        <td><img src="https://geps.dev/progress/100" /></td>
-        <td></td>
-        <td><b>Português (Brasil)(*)</b></td>
-        <td>Complete</td>
-        <td align="center">🇧🇷</td>
-        <td><img src="https://geps.dev/progress/100" /></td>
-    </tr>
-    <tr>
         <td><b>Bahasa Indonesia</b></td>
         <td>Complete</td>
         <td align="center">🇮🇩</td>
         <td><img src="https://geps.dev/progress/100" /></td>
         <td></td>
-        <td><b>Русский(*)</b></td>
+        <td><b>Čeština(*)</b></td>
         <td>Complete</td>
-        <td align="center">🇷🇺</td>
+        <td align="center">🇨🇿</td>
         <td><img src="https://geps.dev/progress/100" /></td>
     </tr>
     <tr>
@@ -83,9 +72,9 @@ Thaw is currently available in the following languages:
         <td align="center">🇩🇪/🇦🇹</td>
         <td><img src="https://geps.dev/progress/100" /></td>
         <td></td>
-        <td><b>简体中文</b></td>
+        <td><b>English</b></td>
         <td>Complete</td>
-        <td align="center">🇨🇳</td>
+        <td align="center">🇬🇧/🇺🇸</td>
         <td><img src="https://geps.dev/progress/100" /></td>
     </tr>
     <tr>
@@ -94,20 +83,9 @@ Thaw is currently available in the following languages:
         <td align="center">🇪🇸/🇲🇽</td>
         <td><img src="https://geps.dev/progress/100" /></td>
         <td></td>
-        <td><b>正體中文</b></td>
-        <td>Complete</td>
-        <td align="center">🇹🇼</td>
-        <td><img src="https://geps.dev/progress/100" /></td>
-    </tr>
-    <tr>
         <td><b>Français</b></td>
         <td>Complete</td>
         <td align="center">🇫🇷</td>
-        <td><img src="https://geps.dev/progress/100" /></td>
-        <td></td>
-        <td><b>한국어</b></td>
-        <td>Complete</td>
-        <td align="center">🇰🇷</td>
         <td><img src="https://geps.dev/progress/100" /></td>
     </tr>
     <tr>
@@ -116,20 +94,20 @@ Thaw is currently available in the following languages:
         <td align="center">🇮🇹</td>
         <td><img src="https://geps.dev/progress/100" /></td>
         <td></td>
-        <td><b>ภาษาไทย</b></td>
+        <td><b>日本語(*)</b></td>
         <td>Complete</td>
-        <td align="center">🇹🇭</td>
+        <td align="center">🇯🇵</td>
         <td><img src="https://geps.dev/progress/100" /></td>
     </tr>
     <tr>
+        <td><b>한국어</b></td>
+        <td>Complete</td>
+        <td align="center">🇰🇷</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+        <td></td>
         <td><b>Magyar</b></td>
         <td>Complete</td>
         <td align="center">🇭🇺</td>
-        <td><img src="https://geps.dev/progress/100" /></td>
-        <td></td>
-        <td><b>Türkçe(*)</b></td>
-        <td>Complete</td>
-        <td align="center">🇹🇷</td>
         <td><img src="https://geps.dev/progress/100" /></td>
     </tr>
     <tr>
@@ -138,10 +116,43 @@ Thaw is currently available in the following languages:
         <td align="center">🇳🇱/🇧🇪</td>
         <td><img src="https://geps.dev/progress/100" /></td>
         <td></td>
-        <td><b>日本語(*)</b></td>
+        <td><b>Português (Brasil)(*)</b></td>
         <td>Complete</td>
-        <td align="center">🇯🇵</td>
+        <td align="center">🇧🇷</td>
         <td><img src="https://geps.dev/progress/100" /></td>
+    </tr>
+    <tr>
+        <td><b>Русский(*)</b></td>
+        <td>Complete</td>
+        <td align="center">🇷🇺</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+        <td></td>
+        <td><b>简体中文</b></td>
+        <td>Complete</td>
+        <td align="center">🇨🇳</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+    </tr>
+    <tr>
+        <td><b>正體中文</b></td>
+        <td>Complete</td>
+        <td align="center">🇹🇼</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+        <td></td>
+        <td><b>ภาษาไทย</b></td>
+        <td>Complete</td>
+        <td align="center">🇹🇭</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+    </tr>
+    <tr>
+        <td><b>Türkçe(*)</b></td>
+        <td>Complete</td>
+        <td align="center">🇹🇷</td>
+        <td><img src="https://geps.dev/progress/100" /></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td align="center"></td>
+        <td></td>
     </tr>
 </table>
 
