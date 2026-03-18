@@ -2871,16 +2871,21 @@ extension MenuBarItemManager {
         // Build a set of bundle IDs that have items with saved sections in hidden/always-hidden.
         // This protects multi-icon apps that the user has explicitly placed in hidden sections
         // without preventing auto-relocation of new items from apps not yet seen.
+        //
+        // NOTE: We extract bundle IDs directly from savedSectionOrder without requiring items
+        // to be currently present. This is critical when the always-hidden section is disabled,
+        // because items from always-hidden end up in hidden/visible and would otherwise be
+        // treated as "new" and relocated.
         var bundleIDsWithSavedHiddenItems = Set<String>()
         for (sectionKeyString, identifiers) in savedSectionOrder {
             guard sectionKeyString == "hidden" || sectionKeyString == "alwaysHidden" else { continue }
             for identifier in identifiers {
-                // Extract bundle ID from identifier (format: "namespace:title:instanceIndex")
+                // Extract namespace from identifier (format: "namespace:title:instanceIndex")
+                // For app items, the namespace IS the bundle ID
                 let ns = identifier.split(separator: ":", maxSplits: 1).first.map(String.init)
-                if let ns,
-                   let matchingItem = items.first(where: { $0.tag.namespace.description == ns }),
-                   let bundleID = bundleID(for: matchingItem) {
-                    bundleIDsWithSavedHiddenItems.insert(bundleID)
+                if let ns, ns.contains(".") {
+                    // Only add if it looks like a bundle ID (contains at least one dot)
+                    bundleIDsWithSavedHiddenItems.insert(ns)
                 }
             }
         }
