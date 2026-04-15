@@ -449,12 +449,13 @@ extension HIDEventManager {
                 }
 
                 if NSEvent.modifierFlags == .option {
-                    if let alwaysHiddenSection = appState.menuBarManager.section(withName: .alwaysHidden),
+                    if appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection,
+                       let alwaysHiddenSection = appState.menuBarManager.section(withName: .alwaysHidden),
                        alwaysHiddenSection.isEnabled
                     {
                         alwaysHiddenSection.show()
-                        return
                     }
+                    return
                 }
 
                 if let hiddenSection = appState.menuBarManager.section(withName: .hidden),

@@ -582,13 +582,15 @@ final class ControlItem {
                     return
                 }
 
-                if
-                    appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection,
-                    modifierFlags == .option,
-                    let section = menuBarManager.section(withName: .alwaysHidden),
-                    section.isEnabled
-                {
-                    section.toggle()
+                if modifierFlags == .option {
+                    // Option-click: only toggle always-hidden if enabled.
+                    if
+                        appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection,
+                        let section = menuBarManager.section(withName: .alwaysHidden),
+                        section.isEnabled
+                    {
+                        section.toggle()
+                    }
                     return
                 }
 
