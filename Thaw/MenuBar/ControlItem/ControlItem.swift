@@ -565,7 +565,7 @@ final class ControlItem {
 
             // Running this from a Task seems to improve the visual
             // responsiveness of the status item's button.
-        Task { [appState] in
+            Task { [appState] in
                 if
                     !appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection,
                     event.clickCount > 1,
@@ -598,7 +598,7 @@ final class ControlItem {
                 {
                     section.toggle()
                 }
-        }
+            }
         case .rightMouseUp:
             showMenu()
         default:
