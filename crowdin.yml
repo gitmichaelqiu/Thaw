@@ -1,1 +1,4 @@
-files: []
+files:
+  - source: '**/Localizable.xcstrings'
+    translation: '**/Localizable.xcstrings'
+    multilingual: 1
