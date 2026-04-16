@@ -349,7 +349,7 @@ final class MenuBarSection {
         menuBarManager.iceBarPanel.close() // Make sure Ice Bar is always closed.
         menuBarManager.showOnHoverAllowed = true
 
-        if appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection {
+        if let appState, appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection {
             for section in menuBarManager.sections {
                 section.desiredState = .hideSection
                 section.updateControlItemState(for: nil)
