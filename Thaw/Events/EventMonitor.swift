@@ -17,6 +17,11 @@ struct EventMonitor {
         private let handler: (NSEvent) -> NSEvent?
         private var monitor: Any?
 
+        /// Whether the monitor is currently installed.
+        var isRunning: Bool {
+            monitor != nil
+        }
+
         init(
             mask: NSEvent.EventTypeMask,
             handler: @escaping (NSEvent) -> NSEvent?
@@ -39,6 +44,9 @@ struct EventMonitor {
                 }
                 return handler(event)
             }
+            if monitor == nil {
+                EventMonitor.diagLog.error("Failed to create local event monitor for mask \(self.mask.rawValue)")
+            }
         }
 
         func stop() {
@@ -47,12 +55,22 @@ struct EventMonitor {
             }
             NSEvent.removeMonitor(monitor)
         }
+
+        func restart() {
+            stop()
+            start()
+        }
     }
 
     private final class GlobalMonitorState: @unchecked Sendable {
         private let mask: NSEvent.EventTypeMask
         private let handler: (NSEvent) -> Void
         private var monitor: Any?
+
+        /// Whether the monitor is currently installed.
+        var isRunning: Bool {
+            monitor != nil
+        }
 
         init(
             mask: NSEvent.EventTypeMask,
@@ -76,6 +94,9 @@ struct EventMonitor {
                 }
                 handler(event)
             }
+            if monitor == nil {
+                EventMonitor.diagLog.error("Failed to create global event monitor for mask \(self.mask.rawValue)")
+            }
         }
 
         func stop() {
@@ -84,6 +105,11 @@ struct EventMonitor {
             }
             NSEvent.removeMonitor(monitor)
         }
+
+        func restart() {
+            stop()
+            start()
+        }
     }
 
     private final class UniversalMonitorState: @unchecked Sendable {
@@ -91,6 +117,11 @@ struct EventMonitor {
         private let localHandler: (NSEvent) -> NSEvent?
         private let globalHandler: (NSEvent) -> Void
         private var monitors: (local: Any, global: Any)?
+
+        /// Whether both monitors are currently installed.
+        var isRunning: Bool {
+            monitors != nil
+        }
 
         init(
             mask: NSEvent.EventTypeMask,
@@ -155,6 +186,11 @@ struct EventMonitor {
             NSEvent.removeMonitor(monitors.local)
             NSEvent.removeMonitor(monitors.global)
         }
+
+        func restart() {
+            stop()
+            start()
+        }
     }
 
     private enum State: @unchecked Sendable {
@@ -167,6 +203,14 @@ struct EventMonitor {
             case .local: .local
             case .global: .global
             case .universal: .universal
+            }
+        }
+
+        var isRunning: Bool {
+            switch self {
+            case let .local(state): state.isRunning
+            case let .global(state): state.isRunning
+            case let .universal(state): state.isRunning
             }
         }
 
@@ -185,6 +229,14 @@ struct EventMonitor {
             case let .universal(state): state.stop()
             }
         }
+
+        func restart() {
+            switch self {
+            case let .local(state): state.restart()
+            case let .global(state): state.restart()
+            case let .universal(state): state.restart()
+            }
+        }
     }
 
     /// Scopes where an event monitor can listen for events.
@@ -199,6 +251,11 @@ struct EventMonitor {
     /// The scope where the monitor listens for events.
     var scope: Scope {
         state.withLock { $0.scope }
+    }
+
+    /// A Boolean value indicating whether the monitor is currently installed and running.
+    var isRunning: Bool {
+        state.withLock { $0.isRunning }
     }
 
     private init(state: State) {
@@ -235,6 +292,40 @@ struct EventMonitor {
     /// Uninstalls the monitor and stops listening for events.
     func stop() {
         state.withLock { $0.stop() }
+    }
+
+    /// Stops and restarts the monitor. Use this to recover from a potentially
+    /// broken state where the underlying NSEvent monitor may have become invalid.
+    func restart() {
+        state.withLock { state in
+            let scope = state.scope
+            EventMonitor.diagLog.info("Restarting \(scope) event monitor")
+            state.restart()
+            if state.isRunning {
+                EventMonitor.diagLog.info("Successfully restarted \(scope) event monitor")
+            } else {
+                EventMonitor.diagLog.error("Failed to restart \(scope) event monitor")
+            }
+        }
+    }
+
+    /// Checks whether the monitor is running and restarts it if not.
+    /// Returns `true` if the monitor is running after this call.
+    @discardableResult
+    func ensureRunning() -> Bool {
+        state.withLock { state in
+            if !state.isRunning {
+                let scope = state.scope
+                EventMonitor.diagLog.warning("\(scope) event monitor not running, attempting restart")
+                state.restart()
+                if state.isRunning {
+                    EventMonitor.diagLog.info("Successfully restarted \(scope) event monitor")
+                } else {
+                    EventMonitor.diagLog.error("Failed to restart \(scope) event monitor after ensureRunning")
+                }
+            }
+            return state.isRunning
+        }
     }
 }
 
