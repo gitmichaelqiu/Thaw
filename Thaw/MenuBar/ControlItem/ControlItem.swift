@@ -577,15 +577,13 @@ final class ControlItem {
                     return
                 }
 
-                if modifierFlags == .control {
+                if modifierFlags.intersection(.deviceIndependentFlagsMask) == .control {
                     showMenu()
                     return
                 }
 
-                if modifierFlags == .option {
-                    // Option-click: only toggle always-hidden if enabled.
+                if modifierFlags.intersection(.deviceIndependentFlagsMask) == .option {
                     if
-                        appState.settings.advanced.useOptionClickToShowAlwaysHiddenSection,
                         let section = menuBarManager.section(withName: .alwaysHidden),
                         section.isEnabled
                     {
