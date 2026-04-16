@@ -107,9 +107,13 @@ final class HIDEventManager: ObservableObject {
         }
         switch event.type {
         case .leftMouseDown:
-            handleShowOnClick(appState: appState, screen: screen, isDoubleClick: event.clickCount > 1)
-            handleSmartRehide(with: event, appState: appState, screen: screen)
-            handleApplicationMenuClickThrough(appState: appState, screen: screen)
+            // Check app menu first - if click is on app menu area, don't trigger
+            // show-on-click or smart rehide (the click belongs to the app menu)
+            let isAppMenuClick = handleApplicationMenuClickThrough(appState: appState, screen: screen)
+            if !isAppMenuClick {
+                handleShowOnClick(appState: appState, screen: screen, isDoubleClick: event.clickCount > 1)
+                handleSmartRehide(with: event, appState: appState, screen: screen)
+            }
         case .rightMouseDown:
             handleSecondaryContextMenu(appState: appState, screen: screen)
         default:
@@ -587,30 +591,39 @@ extension HIDEventManager {
 
     // MARK: Handle Application Menu Click-Through
 
-    /// Forwards clicks to application menus when expanded section-divider
-    /// windows block them.
+    /// Checks if the click is on an application menu (File, Edit, View, etc.)
+    /// and forwards clicks when expanded section-divider windows block them.
     ///
     /// After a profile change with ThawBar active, the Window Server tracks
     /// the expanded control item windows and routes clicks to them instead
     /// of the application menus underneath. This method uses AX to locate
     /// the correct menu bar item, then posts a synthetic click directly to
     /// the owning application's PID.
+    ///
+    /// - Returns: `true` if the click was on an application menu area (regardless
+    ///   of whether forwarding was needed), `false` otherwise. Callers should skip
+    ///   show-on-click behavior when this returns `true`.
+    @discardableResult
     private func handleApplicationMenuClickThrough(
         appState: AppState,
         screen: NSScreen
-    ) {
+    ) -> Bool {
         guard
             isMouseInsideMenuBar(appState: appState, screen: screen),
             isMouseInsideApplicationMenu(appState: appState, screen: screen),
             let mouseLocation = MouseHelpers.locationCoreGraphics
         else {
-            return
+            return false
         }
 
+        // Click is on app menu area - check if we need to forward it
         let hasExpandedDivider = appState.menuBarManager.sections.contains { section in
             section.controlItem.isSectionDivider && section.controlItem.state == .hideSection
         }
-        guard hasExpandedDivider else { return }
+        guard hasExpandedDivider else {
+            // No expanded divider blocking the click, but still on app menu
+            return true
+        }
 
         let expandedWindowCoversClick = Bridging.getMenuBarWindowList(option: [
             .onScreen, .activeSpace, .itemsOnly,
@@ -620,8 +633,12 @@ extension HIDEventManager {
             }
             return bounds.width > Self.maxReasonableItemWidth && bounds.contains(mouseLocation)
         }
-        guard expandedWindowCoversClick else { return }
+        guard expandedWindowCoversClick else {
+            // On app menu but not covered by expanded window
+            return true
+        }
 
+        // Forward the click to the app menu
         appState.menuBarManager.iceBarPanel.close()
         for section in appState.menuBarManager.sections {
             section.hide()
@@ -632,20 +649,20 @@ extension HIDEventManager {
             let axApp = AXHelpers.application(for: frontApp),
             let menuBar: UIElement = try? axApp.attribute(.menuBar)
         else {
-            return
+            return true
         }
 
         for child in AXHelpers.children(for: menuBar) {
             guard let frame = AXHelpers.frame(for: child) else { continue }
             if frame.contains(mouseLocation) {
                 let now = CFAbsoluteTimeGetCurrent()
-                guard now - lastAppMenuClickTime >= 0.3 else { return }
+                guard now - lastAppMenuClickTime >= 0.3 else { return true }
                 lastAppMenuClickTime = now
 
                 let clickPoint = CGPoint(x: frame.midX, y: frame.midY)
                 let pid = frontApp.processIdentifier
 
-                guard let source = CGEventSource(stateID: .hidSystemState) else { return }
+                guard let source = CGEventSource(stateID: .hidSystemState) else { return true }
                 let mouseDown = CGEvent(
                     mouseEventSource: source,
                     mouseType: .leftMouseDown,
@@ -660,9 +677,10 @@ extension HIDEventManager {
                 )
                 mouseDown?.postToPid(pid)
                 mouseUp?.postToPid(pid)
-                return
+                return true
             }
         }
+        return true
     }
 
     // MARK: Handle Menu Bar Item Drag Stop
@@ -834,7 +852,7 @@ extension HIDEventManager {
     ) {
         guard
             appState.settings.general.showOnScroll,
-            isMouseInsideMenuBar(appState: appState, screen: screen),
+            isMouseInsideEmptyMenuBarSpace(appState: appState, screen: screen),
             let hiddenSection = appState.menuBarManager.section(
                 withName: .hidden
             )
